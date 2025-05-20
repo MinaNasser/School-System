@@ -6,89 +6,104 @@
     var allSubjects = ViewBag.Subjects as List<SubjectDTO>;
 }
 
-<h2>Create Student</h2>
-
-<form asp-action="Index" method="post">
-    <div class="form-group">
-        <label asp-for="Name"></label>
-        <input asp-for="Name" class="form-control" />
-        <span asp-validation-for="Name" class="text-danger"></span>
-    </div>
-
-    <div class="form-group">
-        <label asp-for="DateOfBirth"></label>
-        <input asp-for="DateOfBirth" type="date" class="form-control" />
-        <span asp-validation-for="DateOfBirth" class="text-danger"></span>
-    </div>
-
-    <div class="form-group">
-        <label asp-for="Address"></label>
-        <input asp-for="Address" class="form-control" />
-        <span asp-validation-for="Address" class="text-danger"></span>
-    </div>
-
-    <div class="form-group">
-        <label>Subjects:</label><br />
-        @if (allSubjects != null && allSubjects.Any())
-        {
-            foreach (var subject in allSubjects)
-            {
-                <div class="form-check">
-                    <input class="form-check-input" type="checkbox" name="SubjectIds" value="@subject.Id"
-                    @(Model.SubjectIds?.Contains(subject.Id) == true ? "checked" : "") />
-                    <label class="form-check-label">@subject.Name</label>
+<div class="container mt-5 mb-5">
+    <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white">
+            <h4 class="mb-0">➕ Add New Student</h4>
+        </div>
+        <div class="card-body">
+            <form asp-action="Index" method="post">
+                <div class="row mb-3">
+                    <div class="col-md-4">
+                        <label asp-for="Name" class="form-label fw-bold"></label>
+                        <input asp-for="Name" class="form-control" />
+                        <span asp-validation-for="Name" class="text-danger"></span>
+                    </div>
+                    <div class="col-md-4">
+                        <label asp-for="DateOfBirth" class="form-label fw-bold"></label>
+                        <input asp-for="DateOfBirth" type="date" class="form-control" />
+                        <span asp-validation-for="DateOfBirth" class="text-danger"></span>
+                    </div>
+                    <div class="col-md-4">
+                        <label asp-for="Address" class="form-label fw-bold"></label>
+                        <input asp-for="Address" class="form-control" />
+                        <span asp-validation-for="Address" class="text-danger"></span>
+                    </div>
                 </div>
-            }
-        }
-        else
-        {
-            <p>No subjects available.</p>
-        }
+
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Subjects:</label>
+                    <div class="row">
+                        @if (allSubjects != null && allSubjects.Any())
+                        {
+                            foreach (var subject in allSubjects)
+                            {
+                                <div class="col-md-3">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" name="SubjectIds" value="@subject.Id"
+                                        @(Model.SubjectIds?.Contains(subject.Id) == true ? "checked" : "") />
+                                        <label class="form-check-label">@subject.Name</label>
+                                    </div>
+                                </div>
+                            }
+                        }
+                        else
+                        {
+                            <p class="text-muted">No subjects available.</p>
+                        }
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-success px-4">Add Student</button>
+            </form>
+        </div>
     </div>
 
-    <br />
-    <button type="submit" class="btn btn-primary">Add</button>
-</form>
+    <hr class="my-5" />
 
-<hr />
-
-<h3>Students List</h3>
-
-<table class="table table-bordered">
-    <thead class="thead-light">
-        <tr>
-            <th>Name</th>
-            <th>Day of Birth</th>
-            <th>Address</th>
-            <th>Subjects</th>
-            <th>Actions</th>
-        </tr>
-    </thead>
-    <tbody>
-        @if (allStudents != null && allStudents.Any())
-        {
-            foreach (var student in allStudents)
-            {
-                <tr>
-                    <td>@student.Name</td>
-                    <td>@student.DateOfBirth.ToString("yyyy-MM-dd")</td>
-                    <td>@student.Address</td>
-                    <td>@string.Join(" - ", student.SubjectNames)</td>
-                    <td>
-                        <a asp-action="Edit" asp-route-id="@student.Id" class="btn btn-sm btn-warning">Edit</a>
-                        <a asp-action="Delete" asp-route-id="@student.Id" class="btn btn-sm btn-danger">Delete</a>
-                    </td>
-                </tr>
-            }
-        }
-        else
-        {
-            <tr>
-                <td colspan="5" class="text-center">No students available.</td>
-            </tr>
-        }
-    </tbody>
-</table>
+    <div class="card shadow-sm">
+        <div class="card-header bg-dark text-white">
+            <h4 class="mb-0">📋 Students List</h4>
+        </div>
+        <div class="card-body p-0">
+            <table class="table table-striped table-hover mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>Name</th>
+                        <th>Birth Date</th>
+                        <th>Address</th>
+                        <th>Subjects</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (allStudents != null && allStudents.Any())
+                    {
+                        foreach (var student in allStudents)
+                        {
+                            <tr>
+                                <td>@student.Name</td>
+                                <td>@student.DateOfBirth.ToString("yyyy-MM-dd")</td>
+                                <td>@student.Address</td>
+                                <td>@string.Join(" - ", student.SubjectNames)</td>
+                                <td>
+                                    <a asp-action="Edit" asp-route-id="@student.Id" class="btn btn-sm btn-warning me-1">Edit</a>
+                                    <a asp-action="Delete" asp-route-id="@student.Id" class="btn btn-sm btn-danger">Delete</a>
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="5" class="text-center text-muted">No students available.</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
