@@ -7,6 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\School.DTO\School.DTO.csproj" />
     <ProjectReference Include="..\School.Entities\School.Entities.csproj" />
     <ProjectReference Include="..\School.Repositories\School.Repositories.csproj" />
   </ItemGroup>

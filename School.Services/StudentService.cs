@@ -1,6 +1,7 @@
 ﻿using School.Entities;
 using School.Repositories.Interfaces;
 using School.Services.Interfaces;
+using School.DTOs;
 
 namespace School.Services
 {
@@ -8,19 +9,25 @@ namespace School.Services
     {
         private readonly IUnitOfWork _unitOfWork;
 
-
-        public StudentService(IUnitOfWork work)
+        public StudentService(IUnitOfWork unitOfWork)
         {
-            _unitOfWork = work;
+            _unitOfWork = unitOfWork;
         }
-        public async Task AddAsync(Student student, List<int> subjectIds)
+
+        public async Task AddAsync(StudentDTO dto)
         {
-            student.StudentSubjects = subjectIds
-                .Select(subjectId => new StudentSubject
-                {
-                    StudentId = student.Id,
-                    SubjectId = subjectId
-                }).ToList();
+            var student = new Student
+            {
+                Name = dto.Name,
+                Address = dto.Address,
+                DateOfBirth = dto.DateOfBirth,
+                StudentSubjects = dto.SubjectIds
+                    .Select(subjectId => new StudentSubject
+                    {
+                        SubjectId = subjectId
+                    }).ToList()
+            };
+
             await _unitOfWork.Students.AddAsync(student);
             await _unitOfWork.SaveAsync();
         }
@@ -30,44 +37,64 @@ namespace School.Services
             await _unitOfWork.Students.DeleteAsync(id);
             await _unitOfWork.SaveAsync();
         }
-
         public async Task DeleteAsync(Student student)
         {
             await _unitOfWork.Students.DeleteAsync(student);
             await _unitOfWork.SaveAsync();
         }
-
-        public async Task<IEnumerable<Student>> GetAllAsync()
+        public async Task<List<StudentDetailsDTO>> GetAllAsync()
         {
-            return await _unitOfWork.Students.GetAllAsync();
-        }
+            var students = await _unitOfWork.Students.GetAllAsync();
 
-        public async Task<Student> GetByIdAsync(int id)
-        {
-            return await _unitOfWork.Students.GetByIdAsync(id);
-        }
-
-        public async Task UpdateAsync(Student student, List<int> subjectIds)
-        {
-            var existingStudent = await _unitOfWork.Students.GetByIdAsync(student.Id);
-            if (existingStudent == null) return;
-
-            existingStudent.Name = student.Name;
-            existingStudent.Address = student.Address;
-            existingStudent.DateOfBirth = student.DateOfBirth;
-
-
-            existingStudent.StudentSubjects.Clear();
-
-            foreach (var subjectId in subjectIds)
+            return students.Select(s => new StudentDetailsDTO
             {
-                existingStudent.StudentSubjects.Add(new StudentSubject
+                Id = s.Id,
+                Name = s.Name,
+                Address = s.Address,
+                DateOfBirth = s.DateOfBirth,
+                SubjectNames = s.StudentSubjects
+                    .Select(ss => ss.Subject?.Name)
+                    .Where(name => name != null)
+                    .ToList()
+            }).ToList();
+        }
+
+        public async Task<StudentDTO> GetByIdAsync(int id)
+        {
+            var student = await _unitOfWork.Students.GetByIdAsync(id);
+            if (student == null) return null;
+
+            return new StudentDTO
+            {
+                Id = student.Id,
+                Name = student.Name,
+                Address = student.Address,
+                DateOfBirth = student.DateOfBirth,
+                SubjectIds = student.StudentSubjects
+                    .Select(ss => ss.SubjectId)
+                    .ToList()
+            };
+        }
+
+        public async Task UpdateAsync(StudentDTO dto)
+        {
+            var student = await _unitOfWork.Students.GetByIdAsync(dto.Id);
+            if (student == null) return;
+
+            student.Name = dto.Name;
+            student.Address = dto.Address;
+            student.DateOfBirth = dto.DateOfBirth;
+
+            student.StudentSubjects.Clear();
+            foreach (var subjectId in dto.SubjectIds)
+            {
+                student.StudentSubjects.Add(new StudentSubject
                 {
-                    StudentId = student.Id,
                     SubjectId = subjectId
                 });
             }
-            await _unitOfWork.Students.UpdateAsync(existingStudent);
+
+            await _unitOfWork.Students.UpdateAsync(student);
             await _unitOfWork.SaveAsync();
         }
     }
