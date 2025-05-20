@@ -1,0 +1,44 @@
+﻿@model List<SubjectDTO>
+
+@{
+    ViewBag.Title = "Subjects";
+}
+
+<h2>Subjects</h2>
+
+<p>
+    <a asp-action="Create" class="btn btn-primary">Add New Subject</a>
+</p>
+
+<table border="1" cellpadding="5" cellspacing="0" style="width:100%; text-align: left;">
+    <thead style="background-color: #f0f0f0;">
+        <tr>
+            <th>Name</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (Model != null && Model.Any())
+        {
+            foreach (var subject in Model)
+            {
+                <tr>
+                    <td>@subject.Name</td>
+                    <td>
+                        <a asp-action="Edit" asp-route-id="@subject.Id">Edit</a> -
+                        <a asp-action="Delete" asp-route-id="@subject.Id">Delete</a>
+                    </td>
+                </tr>
+            }
+        }
+        else
+        {
+            <tr>
+                <td colspan="2">No subjects available.</td>
+            </tr>
+        }
+    </tbody>
+</table>
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

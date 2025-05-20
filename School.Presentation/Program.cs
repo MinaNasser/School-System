@@ -22,6 +22,7 @@ namespace School.Presentation
                              options.UseLazyLoadingProxies()
                             .UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
             builder.Services.AddScoped<IStudentService, StudentService>();
+            builder.Services.AddScoped<ISubjectService, SubjectService>();
 
             var app = builder.Build();
 
@@ -38,7 +39,7 @@ namespace School.Presentation
 
             app.MapControllerRoute(
                 name: "default",
-                pattern: "{controller=Home}/{action=Index}/{id?}");
+                pattern: "{controller=Student}/{action=Index}/{id?}");
 
             app.Run();
         }
